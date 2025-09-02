@@ -1,404 +1,519 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" id="html-root">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Puzzles: Nonogram, Norinori, Sudoku</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <title>BIE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Roboto', Arial, sans-serif;
-      margin: 20px;
-      background-color: #f0f2f5;
-      color: #2c3e50;
+    :root {
+      --bg: #f8f9fa;
+      --card-bg: white;
+      --text: #2d3748;
+      --heading: #1a202c;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --border: #e2e8f0;
+      --cell-bg: #ffffff;
+      --cell-hover: #edf2f7;
+      --clue-bg: #f1f5f9;
+      --clue-text: #4a5568;
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+      --success: #10b981;
+      --error: #ef4444;
+      --grid-size: 32px;
     }
+
+    .dark-mode {
+      --bg: #121212;
+      --card-bg: #1e1e1e;
+      --text: #e2e8f0;
+      --heading: #ffffff;
+      --border: #374151;
+      --cell-bg: #2d2d2d;
+      --cell-hover: #404040;
+      --clue-bg: #252525;
+      --clue-text: #d1d5db;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      transition: background-color 0.4s, color 0.4s;
+      line-height: 1.6;
+    }
+
     .container {
       max-width: 1200px;
-      margin: auto;
-      background: white;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, var(--accent), #1d4ed8);
+      color: white;
+      border-radius: 12px 12px 0 0;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .logo {
+      font-size: 4em;
+      font-weight: 700;
+      letter-spacing: 3px;
+      margin: 0;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .tagline {
+      font-size: 1.1em;
+      opacity: 0.9;
+      margin: 8px 0 20px;
+    }
+
+    .theme-toggle {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+    }
+
+    .card {
+      background: var(--card-bg);
       padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      box-shadow: var(--shadow);
+      margin-bottom: 30px;
     }
-    h1 {
-      text-align: center;
-      color: #2c3e50;
-      font-weight: 700;
-      font-size: 2.2em;
-      margin-bottom: 10px;
-    }
+
     h2 {
-      color: #34495e;
-      font-weight: 500;
-      margin-top: 40px;
+      color: var(--heading);
+      font-weight: 600;
+      text-align: center;
+      margin: 0 0 20px;
       font-size: 1.5em;
     }
-    .puzzle {
-      margin: 40px 0;
+
+    .controls {
       text-align: center;
+      margin-bottom: 15px;
+      font-size: 15px;
     }
-    button {
-      padding: 12px 24px;
-      font-size: 16px;
-      margin: 10px;
-      background-color: #3498db;
+
+    .controls select, .controls button {
+      margin: 0 6px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--cell-bg);
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    button.primary {
+      background-color: var(--accent);
       color: white;
       border: none;
+      padding: 10px 20px;
+      font-weight: 500;
       border-radius: 6px;
       cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 500;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: background 0.2s;
     }
-    button:hover {
-      background-color: #2980b9;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    button.primary:hover {
+      background-color: var(--accent-hover);
     }
-    button.success {
-      background-color: #27ae60;
+
+    button.check {
+      background-color: #10b981;
+      margin-left: 10px;
     }
+    button.check:hover {
+      background-color: #0d946e;
+    }
+
     .message {
       font-weight: 600;
       font-size: 1.1em;
       margin: 15px 0;
-      min-height: 28px;
-      color: #27ae60;
-      text-shadow: 0 1px 0 #fff;
-    }
-    table {
-      margin: 20px auto;
-      border-collapse: collapse;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    th, td {
-      box-sizing: border-box;
-      width: 32px;
-      height: 32px;
+      min-height: 24px;
       text-align: center;
     }
-    th {
-      background-color: #f8f9fa;
-      color: #555;
-      font-weight: 500;
-      font-size: 14px;
-      padding: 5px;
-      border-right: 1px solid #ddd;
-      border-bottom: 1px solid #ddd;
+
+    /* NONOGRAM */
+    .nonogram-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
     }
-    th:last-child {
-      border-right: none;
+
+    .clues-horizontal {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-left: 40px;
     }
-    td {
-      border: 1px solid #ccc;
-      background-color: #fdfdfd;
-      transition: background 0.15s ease, transform 0.05s ease;
-    }
-    td:hover {
-      background-color: #f0f0f0;
-    }
-    /* Nonogram clue cells */
-    .clue {
-      background-color: #e9ecef !important;
-      color: #495057;
-      font-weight: 500;
-      font-size: 13px;
-      padding: 0 !important;
+
+    .clue-col {
+      width: var(--grid-size);
+      height: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 12px;
+      color: var(--clue-text);
+      background: var(--clue-bg);
+      border: 1px solid var(--border);
     }
-    /* Nonogram cells */
+
+    .grid-body {
+      display: flex;
+    }
+
+    .clues-vertical {
+      display: flex;
+      flex-direction: column;
+      background: var(--clue-bg);
+    }
+
+    .clue-row {
+      width: 40px;
+      height: var(--grid-size);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--clue-text);
+      background: var(--clue-bg);
+      border: 1px solid var(--border);
+    }
+
+    .cells-grid {
+      display: grid;
+      border-top: 1px solid var(--border);
+      border-left: 1px solid var(--border);
+    }
+
     .cell {
+      width: var(--grid-size);
+      height: var(--grid-size);
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background-color: var(--cell-bg);
       cursor: pointer;
-      user-select: none;
+      transition: background 0.1s;
     }
-    .filled {
+    .cell:hover {
+      background-color: var(--cell-hover);
+    }
+    .filled { background-color: #000; }
+
+    /* NORINORI */
+    #norinori table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      border: 1px solid var(--border);
+    }
+    #norinori td {
+      width: 18px;
+      height: 18px;
+      border: 1px solid var(--border);
+      background-color: var(--cell-bg);
+    }
+    #norinori td:nth-child(5n) {
+      border-right: 2px solid #555;
+    }
+    #norinori tr:nth-child(5n) td {
+      border-bottom: 2px solid #555;
+    }
+    #norinori .filled {
       background-color: #000;
-      box-shadow: inset 0 0 4px rgba(0,0,0,0.6);
-    }
-    .crossed {
-      background-color: #aaa;
     }
 
-    /* Norinori */
-    .norinori .cell {
-      background-color: #fcfcfc;
+    /* SUDOKU */
+    #sudoku table {
+      margin: 20px auto;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
     }
-    .norinori .filled {
-      background-color: #2c3e50;
-    }
-
-    /* Sudoku */
     .sudoku input {
-      width: 100%;
-      height: 100%;
+      width: 40px;
+      height: 40px;
       text-align: center;
       font-size: 18px;
       font-weight: 500;
-      border: 1px solid #ddd;
-      padding: 0;
+      border: 1px solid var(--border);
       outline: none;
-      background-color: #fdfdfd;
-      transition: background 0.2s;
+      background-color: var(--cell-bg);
+      color: var(--text);
     }
-    .sudoku input:hover {
-      background-color: #f8f9fa;
-    }
-    .sudoku input.fixed {
-      font-weight: bold;
-      background-color: #e9ecef;
-      color: #2c3e50;
-    }
-    .sudoku input.error {
-      background-color: #fdeded;
-      border-color: #e74c3c;
-    }
-
-    /* Sudoku: bordes gruesos para bloques 3x3 */
     .sudoku tr:nth-child(3n) td {
-      border-bottom: 2px solid #2c3e50;
+      border-bottom: 2px solid var(--accent);
     }
     .sudoku td:nth-child(3n) {
-      border-right: 2px solid #2c3e50;
+      border-right: 2px solid var(--accent);
     }
-    .sudoku tr:last-child td {
-      border-bottom: 1px solid #ccc;
-    }
-    .sudoku td:last-child {
-      border-right: 1px solid #ccc;
-    }
-
-    /* Responsive ajustes */
-    @media (max-width: 700px) {
-      .container { padding: 15px; }
-      h1 { font-size: 1.8em; }
-      h2 { font-size: 1.3em; }
-      table { margin: 15px auto; }
-      th, td { width: 26px; height: 26px; font-size: 12px; }
-      .sudoku input { font-size: 16px; }
-      button { padding: 10px 18px; font-size: 15px; }
-    }
-
-    /* Animaciones sutiles */
-    .cell {
-      transition: background 0.15s ease;
-    }
-    .cell.filled, .cell.crossed {
-      transform: scale(0.95);
+    .sudoku input.fixed {
+      background-color: var(--clue-bg);
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🧩 Puzzles Interactivos</h1>
+    <header>
+      <h1 class="logo">BIE</h1>
+      <p class="tagline">Puzzles Lógicos Interactivos</p>
+      <button class="theme-toggle" id="theme-toggle">🌙 Oscuro</button>
+    </header>
 
-    <!-- Nonogram 5x5 -->
-    <div class="puzzle">
-      <h2>Nonograma 5×5</h2>
-      <button onclick="generateNonogram(5)">🔄 Generar Nuevo</button>
-      <div class="message" id="msg-nonogram5"></div>
-      <div id="nonogram5"></div>
+    <!-- Nonogram -->
+    <div class="card">
+      <h2>Nonograma</h2>
+      <div class="controls">
+        <select id="nonogram-size">
+          <option value="5">5×5</option>
+          <option value="10" selected>10×10</option>
+        </select>
+        <select id="nonogram-diff">
+          <option value="easy">Fácil</option>
+          <option value="normal" selected>Normal</option>
+          <option value="hard">Difícil</option>
+        </select>
+        <button class="primary" onclick="generateNonogram()">🔄 Nuevo</button>
+        <button class="primary check" onclick="checkNonogramOnlyBlack()">✅ Corregir</button>
+      </div>
+      <div class="message" id="msg-nonogram"></div>
+      <div id="nonogram-container"></div>
     </div>
 
-    <!-- Nonogram 10x10 -->
-    <div class="puzzle">
-      <h2>Nonograma 10×10</h2>
-      <button onclick="generateNonogram(10)">🔄 Generar Nuevo</button>
-      <div class="message" id="msg-nonogram10"></div>
-      <div id="nonogram10"></div>
-    </div>
-
-    <!-- Norinori 20x20 -->
-    <div class="puzzle">
+    <!-- Norinori -->
+    <div class="card">
       <h2>Norinori 20×20</h2>
-      <button onclick="generateNorinori()">🔄 Generar Nuevo</button>
+      <div class="controls">
+        <button class="primary" onclick="generateNorinori()">🔄 Nuevo</button>
+        <button class="primary check" onclick="checkNorinoriOnlyBlack()">✅ Corregir</button>
+      </div>
       <div class="message" id="msg-norinori"></div>
       <div id="norinori"></div>
     </div>
 
     <!-- Sudoku -->
-    <div class="puzzle">
-      <h2>Sudoku (Nivel Normal)</h2>
-      <button onclick="generateSudoku()">🔄 Generar Nuevo</button>
+    <div class="card">
+      <h2>Sudoku</h2>
+      <div class="controls">
+        <select id="sudoku-diff">
+          <option value="easy">Fácil</option>
+          <option value="normal" selected>Normal</option>
+          <option value="hard">Difícil</option>
+        </select>
+        <button class="primary" onclick="generateSudoku()">🔄 Nuevo</button>
+        <button class="primary check" onclick="validateSudoku()">✅ Corregir</button>
+      </div>
       <div class="message" id="msg-sudoku"></div>
       <div id="sudoku"></div>
     </div>
   </div>
 
   <script>
-    // Estado global para soluciones
     const State = {
-      nonogram5: { solution: null, size: 5 },
-      nonogram10: { solution: null, size: 10 },
+      nonogram: { solution: null, size: 10 },
       norinori: { solution: null, dominoMap: null },
       sudoku: { solution: null, puzzle: null }
     };
 
+    // 🌙 Modo oscuro
+    const themeToggle = document.getElementById("theme-toggle");
+    const htmlRoot = document.getElementById("html-root");
+
+    themeToggle.addEventListener("click", () => {
+      const isDark = htmlRoot.classList.toggle("dark-mode");
+      themeToggle.textContent = isDark ? "☀️ Claro" : "🌙 Oscuro";
+      localStorage.setItem("bie-theme", isDark ? "dark" : "light");
+    });
+
+    const savedTheme = localStorage.getItem("bie-theme");
+    if (savedTheme === "dark") {
+      htmlRoot.classList.add("dark-mode");
+      themeToggle.textContent = "☀️ Claro";
+    }
+
     // --------------------------
     // NONOGRAM GENERATOR
     // --------------------------
-    function generateNonogram(size) {
-      const id = `nonogram${size}`;
-      const msgId = `msg-${id}`;
-      document.getElementById(msgId).textContent = "";
-      const container = document.getElementById(id);
+    function generateNonogram() {
+      const size = +document.getElementById("nonogram-size").value;
+      const diff = document.getElementById("nonogram-diff").value;
+      const density = { easy: 0.3, normal: 0.4, hard: 0.5 }[diff];
+
+      const container = document.getElementById("nonogram-container");
       container.innerHTML = "";
+      document.getElementById("msg-nonogram").textContent = "";
 
       const solution = Array(size).fill().map(() => Array(size).fill(0));
       for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
-          solution[i][j] = Math.random() < 0.4 ? 1 : 0;
+          if (Math.random() < density) solution[i][j] = 1;
         }
       }
-      State[id] = { solution, size };
+      State.nonogram = { solution, size };
 
-      // Pistas
-      const rowClues = solution.map(row => {
-        const clues = [];
-        let count = 0;
-        for (let cell of row) {
-          if (cell === 1) count++;
-          else if (count > 0) {
-            clues.push(count);
-            count = 0;
-          }
-        }
-        if (count > 0) clues.push(count);
-        return clues.length ? clues : [0];
-      });
-
+      // Pistas columnas (arriba)
       const colClues = [];
       for (let j = 0; j < size; j++) {
         const clues = [];
         let count = 0;
         for (let i = 0; i < size; i++) {
-          if (solution[i][j] === 1) count++;
-          else if (count > 0) {
+          if (solution[i][j]) count++;
+          else if (count) {
             clues.push(count);
             count = 0;
           }
         }
-        if (count > 0) clues.push(count);
+        if (count) clues.push(count);
         colClues.push(clues.length ? clues : [0]);
       }
 
-      const table = document.createElement("table");
-
-      // Encabezado (pistas de columnas)
-      const header = document.createElement("tr");
-      header.appendChild(createTh(""));
-      colClues.forEach(clue => {
-        const th = createTh(clue.join(" "));
-        th.classList.add("clue");
-        header.appendChild(th);
-      });
-      table.appendChild(header);
-
-      // Filas
-      for (let i = 0; i < size; i++) {
-        const tr = document.createElement("tr");
-        const clueTd = createTd(rowClues[i].join(" "));
-        clueTd.classList.add("clue");
-        tr.appendChild(clueTd);
-
-        for (let j = 0; j < size; j++) {
-          const td = createTd("");
-          td.className = "cell";
-          td.dataset.row = i;
-          td.dataset.col = j;
-          td.onclick = function() {
-            if (this.classList.contains("filled")) {
-              this.classList.remove("filled");
-              this.classList.add("crossed");
-            } else if (this.classList.contains("crossed")) {
-              this.classList.remove("crossed");
-            } else {
-              this.classList.add("filled");
-            }
-            checkNonogram(size);
-          };
-          tr.appendChild(td);
+      // Pistas filas (izquierda)
+      const rowClues = solution.map(row => {
+        const clues = [];
+        let count = 0;
+        for (let cell of row) {
+          if (cell) count++;
+          else if (count) {
+            clues.push(count);
+            count = 0;
+          }
         }
-        table.appendChild(tr);
+        if (count) clues.push(count);
+        return clues.length ? clues : [0];
+      });
+
+      const maxClueLen = Math.max(...colClues.map(c => c.length));
+
+      // Espacio para pistas superiores
+      const clueTop = document.createElement("div");
+      clueTop.className = "clues-horizontal";
+      for (let j = 0; j < size; j++) {
+        const div = document.createElement("div");
+        div.className = "clue-col";
+        const span = document.createElement("span");
+        span.textContent = colClues[j].join(" ");
+        div.appendChild(span);
+        clueTop.appendChild(div);
       }
 
-      container.appendChild(table);
+      // Celdas + pistas laterales
+      const body = document.createElement("div");
+      body.className = "grid-body";
+
+      const clueLeft = document.createElement("div");
+      clueLeft.className = "clues-vertical";
+      for (let i = 0; i < size; i++) {
+        const div = document.createElement("div");
+        div.className = "clue-row";
+        div.textContent = rowClues[i].join(" ");
+        clueLeft.appendChild(div);
+      }
+      body.appendChild(clueLeft);
+
+      const grid = document.createElement("div");
+      grid.className = "cells-grid";
+      grid.style.gridTemplateColumns = `repeat(${size}, var(--grid-size))`;
+
+      for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+          const cell = document.createElement("div");
+          cell.className = "cell";
+          cell.dataset.row = i;
+          cell.dataset.col = j;
+          cell.onclick = function () {
+            this.classList.toggle("filled");
+          };
+          grid.appendChild(cell);
+        }
+      }
+      body.appendChild(grid);
+
+      container.appendChild(clueTop);
+      container.appendChild(body);
     }
 
-    function createTh(txt) {
-      const th = document.createElement("th");
-      th.textContent = txt;
-      return th;
-    }
-    function createTd(txt) {
-      const td = document.createElement("td");
-      td.textContent = txt;
-      return td;
-    }
-
-    function checkNonogram(size) {
-      const id = `nonogram${size}`;
-      const solution = State[id].solution;
-      const cells = document.querySelectorAll(`#${id} .cell`);
-      let solved = true;
+    // Solo verifica celdas negras (correctas)
+    function checkNonogramOnlyBlack() {
+      const { solution, size } = State.nonogram;
+      const cells = document.querySelectorAll("#nonogram-container .cell");
+      let allCorrect = true;
 
       for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
           const idx = i * size + j;
           const cell = cells[idx];
-          const shouldBeFilled = solution[i][j] === 1;
           const isFilled = cell.classList.contains("filled");
-          if (shouldBeFilled !== isFilled) {
-            solved = false;
+          const shouldBeFilled = solution[i][j] === 1;
+
+          if (isFilled && !shouldBeFilled) {
+            allCorrect = false;
             break;
           }
         }
-        if (!solved) break;
+        if (!allCorrect) break;
       }
 
-      const msgId = `msg-${id}`;
-      if (solved) {
-        document.getElementById(msgId).textContent = "✅ ¡Nonograma resuelto!";
+      const msg = document.getElementById("msg-nonogram");
+      if (allCorrect) {
+        msg.textContent = "✅ ¡Todas tus casillas negras son correctas!";
+        msg.style.color = "var(--success)";
       } else {
-        document.getElementById(msgId).textContent = "";
+        msg.textContent = "❌ Alguna casilla negra está mal colocada.";
+        msg.style.color = "var(--error)";
       }
     }
 
     // --------------------------
-    // NORINORI GENERATOR
+    // NORINORI
     // --------------------------
     function generateNorinori() {
       const size = 20;
       const container = document.getElementById("norinori");
-      const msg = document.getElementById("msg-norinori");
       container.innerHTML = "";
-      msg.textContent = "";
+      document.getElementById("msg-norinori").textContent = "";
 
       const solution = Array(size).fill().map(() => Array(size).fill(0));
       const dominoMap = Array(size).fill().map(() => Array(size).fill(null));
       const used = Array(size).fill().map(() => Array(size).fill(false));
-      let dominoId = 0;
+      let id = 0;
 
       for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
           if (used[i][j]) continue;
-          const orientations = [];
-          if (j + 1 < size && !used[i][j+1]) orientations.push("h");
-          if (i + 1 < size && !used[i+1][j]) orientations.push("v");
-          if (orientations.length === 0) continue;
+          const opts = [];
+          if (j+1 < size && !used[i][j+1]) opts.push("h");
+          if (i+1 < size && !used[i+1][j]) opts.push("v");
+          if (!opts.length) continue;
 
-          const dir = orientations[Math.floor(Math.random() * orientations.length)];
-          const id = dominoId++;
+          const dir = opts[Math.floor(Math.random() * opts.length)];
           if (dir === "h") {
             used[i][j] = used[i][j+1] = true;
-            dominoMap[i][j] = dominoMap[i][j+1] = id;
+            dominoMap[i][j] = dominoMap[i][j+1] = id++;
           } else {
             used[i][j] = used[i+1][j] = true;
-            dominoMap[i][j] = dominoMap[i+1][j] = id;
+            dominoMap[i][j] = dominoMap[i+1][j] = id++;
           }
         }
       }
@@ -406,8 +521,6 @@
       State.norinori = { solution, dominoMap };
 
       const table = document.createElement("table");
-      table.className = "norinori";
-
       for (let i = 0; i < size; i++) {
         const tr = document.createElement("tr");
         for (let j = 0; j < size; j++) {
@@ -415,113 +528,106 @@
           td.className = "cell";
           td.dataset.row = i;
           td.dataset.col = j;
-          td.onclick = function() {
-            this.classList.toggle("filled");
-            checkNorinori();
+          td.onclick = () => {
+            td.classList.toggle("filled");
           };
           tr.appendChild(td);
         }
         table.appendChild(tr);
       }
-
       container.appendChild(table);
     }
 
-    function checkNorinori() {
+    function checkNorinoriOnlyBlack() {
       const { dominoMap } = State.norinori;
       const cells = document.querySelectorAll("#norinori .cell");
-      const filledMap = new Map();
+      const countMap = new Map();
 
       cells.forEach(cell => {
-        const r = parseInt(cell.dataset.row);
-        const c = parseInt(cell.dataset.col);
+        const r = cell.dataset.row | 0;
+        const c = cell.dataset.col | 0;
         const id = dominoMap[r][c];
-        if (id !== null) {
-          if (!filledMap.has(id)) filledMap.set(id, 0);
-          if (cell.classList.contains("filled")) {
-            filledMap.set(id, filledMap.get(id) + 1);
-          }
+        if (id === null) return;
+        if (!countMap.has(id)) countMap.set(id, 0);
+        if (cell.classList.contains("filled")) {
+          countMap.set(id, countMap.get(id) + 1);
         }
       });
 
-      let solved = true;
-      for (let count of filledMap.values()) {
-        if (count !== 1) {
-          solved = false;
+      let allGood = true;
+      for (let count of countMap.values()) {
+        if (count > 1) {
+          allGood = false;
           break;
         }
       }
 
       const msg = document.getElementById("msg-norinori");
-      if (solved && filledMap.size > 0) {
-        msg.textContent = "✅ ¡Norinori resuelto! Un cuadrado por dominó.";
+      if (allGood) {
+        msg.textContent = "✅ ¡Tus casillas negras están bien colocadas!";
+        msg.style.color = "var(--success)";
       } else {
-        msg.textContent = "";
+        msg.textContent = "❌ Más de un negro en algún dominó.";
+        msg.style.color = "var(--error)";
       }
     }
 
     // --------------------------
-    // SUDOKU GENERATOR
+    // SUDOKU
     // --------------------------
     function generateSudoku() {
+      const diff = document.getElementById("sudoku-diff").value;
+      const toRemove = { easy: 40, normal: 45, hard: 50 }[diff];
+
       const container = document.getElementById("sudoku");
-      const msg = document.getElementById("msg-sudoku");
       container.innerHTML = "";
-      msg.textContent = "";
+      document.getElementById("msg-sudoku").textContent = "";
 
       let board = Array(9).fill().map(() => Array(9).fill(0));
 
-      function isValid(row, col, num) {
+      function isValid(r, c, n) {
         for (let i = 0; i < 9; i++) {
-          if (board[row][i] === num || board[i][col] === num) return false;
+          if (board[r][i] === n || board[i][c] === n) return false;
         }
-        const br = Math.floor(row / 3) * 3;
-        const bc = Math.floor(col / 3) * 3;
+        const br = Math.floor(r / 3) * 3, bc = Math.floor(c / 3) * 3;
         for (let i = 0; i < 3; i++) {
           for (let j = 0; j < 3; j++) {
-            if (board[br + i][bc + j] === num) return false;
+            if (board[br+i][bc+j] === n) return false;
           }
         }
         return true;
       }
 
-      function solve(row = 0, col = 0) {
-        if (row === 9) return true;
-        if (col === 9) return solve(row + 1, 0);
-        if (board[row][col] !== 0) return solve(row, col + 1);
-
-        const nums = [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5);
-        for (let num of nums) {
-          if (isValid(row, col, num)) {
-            board[row][col] = num;
-            if (solve(row, col + 1)) return true;
+      function solve(r = 0, c = 0) {
+        if (r === 9) return true;
+        if (c === 9) return solve(r+1, 0);
+        if (board[r][c]) return solve(r, c+1);
+        for (let n of [1,2,3,4,5,6,7,8,9].sort(() => Math.random()-0.5)) {
+          if (isValid(r,c,n)) {
+            board[r][c] = n;
+            if (solve(r, c+1)) return true;
           }
         }
-        board[row][col] = 0;
+        board[r][c] = 0;
         return false;
       }
 
       solve();
-      State.sudoku.solution = board.map(row => [...row]);
+      State.sudoku.solution = board.map(r => [...r]);
 
-      // Crear puzzle
-      const puzzle = board.map(row => [...row]);
+      const puzzle = board.map(r => [...r]);
       const cells = [];
-      for (let i = 0; i < 9; i++) {
-        for (let j = 0; j < 9; j++) {
-          cells.push([i, j]);
-        }
-      }
+      for (let i = 0; i < 9; i++) for (let j = 0; j < 9; j++) cells.push([i,j]);
       cells.sort(() => Math.random() - 0.5);
-      for (let k = 0; k < 45; k++) {
-        const [i, j] = cells[k];
+      for (let k = 0; k < toRemove; k++) {
+        const [i,j] = cells[k];
         puzzle[i][j] = 0;
       }
+
       State.sudoku.puzzle = puzzle;
 
       const table = document.createElement("table");
       table.className = "sudoku";
-
       for (let i = 0; i < 9; i++) {
         const tr = document.createElement("tr");
         for (let j = 0; j < 9; j++) {
@@ -531,16 +637,8 @@
           input.maxLength = 1;
           input.dataset.row = i;
           input.dataset.col = j;
-          if (puzzle[i][j] !== 0) {
-            input.value = puzzle[i][j];
-            input.classList.add("fixed");
-            input.readOnly = true;
-          } else {
-            input.addEventListener("input", function () {
-              this.value = this.value.replace(/[^1-9]/g, '');
-              validateSudoku();
-            });
-          }
+          if (puzzle[i][j]) input.value = puzzle[i][j], input.readOnly = true, input.classList.add("fixed");
+          else input.addEventListener("input", () => input.value = input.value.replace(/[^1-9]/, ''));
           td.appendChild(input);
           tr.appendChild(td);
         }
@@ -551,47 +649,36 @@
 
     function validateSudoku() {
       const inputs = document.querySelectorAll("#sudoku input");
-      const grid = Array(9).fill().map(() => Array(9).fill(0));
-      let complete = true;
+      const sol = State.sudoku.solution;
+      let allCorrect = true;
 
       for (let input of inputs) {
-        const r = parseInt(input.dataset.row);
-        const c = parseInt(input.dataset.col);
+        const r = input.dataset.row | 0;
+        const c = input.dataset.col | 0;
         const val = input.value.trim();
-        if (val === "") {
-          complete = false;
-          grid[r][c] = 0;
-        } else {
-          grid[r][c] = parseInt(val);
+        if (val && +val !== sol[r][c]) {
+          allCorrect = false;
+          break;
         }
-      }
-
-      if (!complete) return;
-
-      const solution = State.sudoku.solution;
-      let correct = true;
-      for (let i = 0; i < 9; i++) {
-        for (let j = 0; j < 9; j++) {
-          if (grid[i][j] !== solution[i][j]) {
-            correct = false;
-            break;
-          }
-        }
-        if (!correct) break;
       }
 
       const msg = document.getElementById("msg-sudoku");
-      if (correct) {
-        msg.textContent = "✅ ¡Sudoku resuelto correctamente!";
-        msg.style.color = "#27ae60";
+      if (allCorrect) {
+        msg.textContent = "✅ ¡Tus números son correctos!";
+        msg.style.color = "var(--success)";
       } else {
-        msg.textContent = "❌ Algo no coincide. Revisa tus números.";
-        msg.style.color = "#e74c3c";
+        msg.textContent = "❌ Algún número no coincide.";
+        msg.style.color = "var(--error)";
       }
     }
 
-    // Iniciar con un nonograma pequeño
-    window.onload = () => generateNonogram(5);
+    window.onload = () => {
+      if (localStorage.getItem("bie-theme") === "dark") {
+        htmlRoot.classList.add("dark-mode");
+        themeToggle.textContent = "☀️ Claro";
+      }
+      generateNonogram();
+    };
   </script>
 </body>
 </html>
